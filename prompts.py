@@ -13,11 +13,11 @@ Write the final solution in Python3 programming language to solve the problem.
     a. Do not use any external libraries; stick to Python 3 standard library
     b. Handle input and output using standard input/output (stdin/stdout)
     c. Use helper functions to improve readability of the code.
-    c. Use the `input()` function to take input from stdin and print the output to stdout.
-    d. Do not add extra print statements otherwise it will fail the test cases.
-    e. Make sure your code passes all potential test cases, including edge cases
-    f. Follow the input/output format specified in the problem statement and the sample test cases.
-    g. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
+    d. Use the `input()` function to take input from stdin and print the output to stdout.
+    e. Do not add extra print statements otherwise it will fail the test cases.
+    f. Make sure your code passes all potential test cases, including edge cases
+    g. Follow the input/output format specified in the problem statement and the sample test cases.
+    h. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
 """
 
 # prompt_template = """
@@ -36,11 +36,11 @@ Write the final solution in Python3 programming language to solve the problem.
 #     a. Do not use any external libraries; stick to Python 3 standard library
 #     b. Handle input and output using standard input/output (stdin/stdout)
 #     c. Use helper functions to improve readability of the code.
-#     c. Use the `input()` function to take input from stdin and print the output to stdout.
-#     d. Do not add extra print statements otherwise it will fail the test cases.
-#     e. Make sure your code passes all potential test cases, including edge cases
-#     f. Follow the input/output format specified in the problem statement and the sample test cases.
-#     g. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
+#     d. Use the `input()` function to take input from stdin and print the output to stdout.
+#     e. Do not add extra print statements otherwise it will fail the test cases.
+#     f. Make sure your code passes all potential test cases, including edge cases
+#     g. Follow the input/output format specified in the problem statement and the sample test cases.
+#     h. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
 # """
 
 # system_prompt = """You are an expert problem solver. Your task is creating the code to solve the problem at hand in python.
@@ -49,11 +49,11 @@ Write the final solution in Python3 programming language to solve the problem.
 #     a. Do not use any external libraries; stick to Python 3 standard library
 #     b. Handle input and output using standard input/output (stdin/stdout)
 #     c. Use helper functions to improve readability of the code.
-#     c. Use the `input()` function to take input from stdin and print the output to stdout.
-#     d. Do not add extra print statements otherwise it will fail the test cases.
-#     e. Make sure your code passes all potential test cases, including edge cases
-#     f. Follow the input/output format specified in the problem statement and the sample test cases.
-#     g. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
+#     d. Use the `input()` function to take input from stdin and print the output to stdout.
+#     e. Do not add extra print statements otherwise it will fail the test cases.
+#     f. Make sure your code passes all potential test cases, including edge cases
+#     g. Follow the input/output format specified in the problem statement and the sample test cases.
+#     h. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
 
 # """
 
@@ -72,11 +72,11 @@ Write the final solution in Python3 programming language to solve the problem.
 #     a. Do not use any external libraries; stick to Python 3 standard library
 #     b. Handle input and output using standard input/output (stdin/stdout)
 #     c. Use helper functions to improve readability of the code.
-#     c. Use the `input()` function to take input from stdin and print the output to stdout.
-#     d. Do not add extra print statements otherwise it will fail the test cases.
-#     e. Make sure your code passes all potential test cases, including edge cases
-#     f. Follow the input/output format specified in the problem statement and the sample test cases.
-#     g. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
+#     d. Use the `input()` function to take input from stdin and print the output to stdout.
+#     e. Do not add extra print statements otherwise it will fail the test cases.
+#     f. Make sure your code passes all potential test cases, including edge cases
+#     g. Follow the input/output format specified in the problem statement and the sample test cases.
+#     h. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
 
 # Create a python program that returns the correct output for the given input.
 # """
@@ -99,11 +99,11 @@ Write the improved solution in Python3 programming language to solve the problem
     a. Do not use any external libraries; stick to Python 3 standard library
     b. Handle input and output using standard input/output (stdin/stdout)
     c. Use helper functions to improve readability of the code.
-    c. Use the `input()` function to take input from stdin and print the output to stdout.
-    d. Do not add extra print statements otherwise it will fail the test cases.
-    e. Make sure your code passes all potential test cases, including edge cases
-    f. Follow the input/output format specified in the problem statement and the sample test cases.
-    g. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
+    d. Use the `input()` function to take input from stdin and print the output to stdout.
+    e. Do not add extra print statements otherwise it will fail the test cases.
+    f. Make sure your code passes all potential test cases, including edge cases
+    g. Follow the input/output format specified in the problem statement and the sample test cases.
+    h. We will run the program by calling `python3 program.py` so make sure it outputs the correct results.
 
 {problem_description}
 
