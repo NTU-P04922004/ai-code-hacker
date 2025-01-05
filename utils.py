@@ -1,30 +1,25 @@
 import asyncio
-import os
 import json
-import re
-
 import logging
+import math
+import re
+import sys
 from pathlib import Path
 from typing import List
-import math
-import sys
-from rich.logging import RichHandler
 
-import weave
 
 def load_jsonl(file: Path) -> List[dict]:
     """Load a JSONL file"""
     with open(file, 'r') as f:
         return [json.loads(line) for line in f]
 
-class TimeoutException(Exception):
-    pass
 
-def setup_logger(debug = False, silence_openai = True):
+def setup_logger(debug=False, silence_openai=True):
     level = logging.DEBUG if debug else logging.INFO
     logging.basicConfig(
-        level=level, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(markup=True)]
+        level=level, format="%(message)s", datefmt="[%X]", handlers=[logging.StreamHandler()]
     )
+
     # silence openai logger
     if silence_openai:
         logging.getLogger("httpcore").setLevel(logging.WARNING)
@@ -38,6 +33,7 @@ def maybe_remove_backticks(solution: str) -> str:
     solution = re.sub(r'^```python\s*', '', solution)
     solution = re.sub(r'\s*```$', '', solution)
     return solution
+
 
 def compare_lines_with_tolerance(expected: str, actual: str, tolerance: float = 1e-9) -> bool:
     """
@@ -74,10 +70,11 @@ def compare_lines_with_tolerance(expected: str, actual: str, tolerance: float = 
 
     return True
 
-@weave.op
+
 def check_correctness(expected: str, actual: str) -> dict:
     "Check the solution against the expected output"
     return compare_lines_with_tolerance(expected, actual)
+
 
 async def _run_subprocess(command: list, input_file: Path, output_file: Path, timeout: float):
     """Run a subprocess with the given command, input file, and output file.
@@ -86,7 +83,7 @@ async def _run_subprocess(command: list, input_file: Path, output_file: Path, ti
     input_file (Path): The path to the input file.
     output_file (Path): The path to the output file.
     timeout (float): The maximum time to allow for the subprocess to run.
-    
+
     Raises:
         RuntimeError: If the subprocess fails or times out."""
     try:
@@ -101,7 +98,8 @@ async def _run_subprocess(command: list, input_file: Path, output_file: Path, ti
             _, stderr = await asyncio.wait_for(process.communicate(), timeout=timeout)
         except asyncio.TimeoutError:
             process.kill()
-            raise TimeoutError(f"Program execution timed out after {timeout} seconds")
+            raise TimeoutError(
+                f"Program execution timed out after {timeout} seconds")
 
         if process.returncode != 0:
             raise RuntimeError(f"Program execution failed: {stderr.decode()}")
@@ -109,6 +107,7 @@ async def _run_subprocess(command: list, input_file: Path, output_file: Path, ti
         logging.debug(f"Output saved to {output_file}")
     except Exception as e:
         raise RuntimeError(f"Error running subprocess: {str(e)}")
+
 
 async def run_python(program: Path, input_file: Path, output_file: Path, timeout: float = 10):
     """Run a Python program with the given input file and output file.
@@ -118,53 +117,19 @@ async def run_python(program: Path, input_file: Path, output_file: Path, timeout
         input_file (Path): The path to the input file.
         output_file (Path): The path to the output file.
         timeout (float): The maximum time to allow for the program to run.
-        
+
     Raises:
         RuntimeError: If there is an error running the Python program.
     """
     await _run_subprocess([sys.executable, str(program)], input_file, output_file, timeout)
 
 
-async def run_cpp(cpp_file: Path, input_file: Path, output_file: Path, timeout: float = 10, cpp_version: int = 11):
-    """Run a C++ program with the given input file and output file.
-
-    Parameters:
-        cpp_file (Path): The path to the C++ source file to compile and execute.
-        input_file (Path): The path to the input file.
-        output_file (Path): The path to the output file.
-        timeout (float): The maximum time to allow for the program to run.
-        cpp_version (int): The C++ standard version to use for compilation.
-        
-    Raises:
-        RuntimeError: If compilation fails or if there is an error running the C++ program.
-    """
-    
-    base_name = os.path.splitext(cpp_file.name)[0]
-    compile_command = f"g++ {cpp_file} -std=c++{cpp_version} -o {base_name}"
-    process = await asyncio.create_subprocess_shell(
-        compile_command, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    _, stderr = await process.communicate()
-
-    if process.returncode != 0:
-        raise RuntimeError(f"Compilation failed: {stderr.decode()}")
-
-    try:
-        await _run_subprocess([f"./{base_name}"], input_file, output_file, timeout)
-    finally:
-        if os.path.exists(base_name):
-            os.remove(base_name)
-
-@weave.op
 async def run_program(code: Path, input: Path, output: Path, timeout: float = 10, cpp_version: int = 11):
     """
     Run the program with the given code and input file. Write the output to the given output file.
     """
     try:
-        if code.suffix == ".cpp":
-            logging.debug(f"Running C++ program: {code}")
-            await run_cpp(code, input, output, timeout, cpp_version)
-        elif code.suffix == ".py":
+        if code.suffix == ".py":
             logging.debug(f"Running Python program: {code}")
             await run_python(code, input, output, timeout)
         else:
@@ -173,62 +138,14 @@ async def run_program(code: Path, input: Path, output: Path, timeout: float = 10
         raise e
     return
 
-if __name__ == "__main__":
-    # Test check_solution
-    expected = "Case #1: YES\nCase #2: NO\nCase #3: YES"
-    actual = "Case #1: YES\nCase #2: Yes\nCase #3: YES"
-    result = check_correctness(expected, actual)
-    assert not result["matches"], "Expected no matches"
 
-    # Test maybe_remove_backticks
-    assert maybe_remove_backticks("print('hello')\n```") == "print('hello')"
-    assert maybe_remove_backticks("print('hello')\n```  ") == "print('hello')"
-    assert maybe_remove_backticks("```python\nprint('hello')") == "print('hello')"
-    assert maybe_remove_backticks("```python\nprint('hello')\n```") == "print('hello')"
+def extract_python_code_blocks(markdown_string: str) -> List[str]:
+    # Define a regular expression to find Python code blocks
+    # This regex looks for ```python to open and ``` to close, capturing content in between
+    pattern = r"```python(.*?)```"
 
-    # Test run_python
-    async def test_run_python():
-        code = Path("test_program.py")
-        input_file = Path("test_input.txt")
-        output_file = Path("test_output.txt")
+    # Use re.DOTALL to make '.' match newlines as well
+    code_blocks = re.findall(pattern, markdown_string, re.DOTALL)
 
-        # Create test files
-        code.write_text("print(input())")
-        input_file.write_text("hello")
-
-        await run_python(code, input_file, output_file)
-
-        # Check output
-        assert output_file.read_text().strip() == "hello", "Expected output to be 'hello'"
-
-        # Clean up
-        code.unlink()
-        input_file.unlink()
-        output_file.unlink()
-
-    asyncio.run(test_run_python())
-
-    # Test run_cpp
-    async def test_run_cpp():
-        code = Path("test_program.cpp")
-        input_file = Path("test_input.txt")
-        output_file = Path("test_output.txt")
-
-        # Create test files
-        code.write_text('#include <iostream>\nint main() { std::string input; std::cin >> input; std::cout << input; return 0; }')
-        input_file.write_text("hello")
-
-        await run_cpp(code, input_file, output_file)
-
-        # Check output
-        assert output_file.read_text().strip() == "hello", "Expected output to be 'hello'"
-
-        # Clean up
-        code.unlink()
-        input_file.unlink()
-        output_file.unlink()
-
-    asyncio.run(test_run_cpp())
-
-    print("All tests passed!")
-
+    # Strip leading and trailing whitespace (including newlines) from each code block
+    return [block.strip() for block in code_blocks]
