@@ -37,3 +37,13 @@ Finally, give back the modified and updated solution.
 {test_results}
 
 """
+
+FAILED_REPORT_PROMPT = """\
+<expected>
+{gt_output}
+</expected>
+---
+<got>
+{program_output}
+</got>
+"""

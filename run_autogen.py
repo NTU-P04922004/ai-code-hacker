@@ -1,32 +1,18 @@
 import argparse
 import asyncio
-import sys
 import os
 from typing import List, Union, Dict, Callable
 from pathlib import Path
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-parent_dir = os.path.dirname(current_dir)
-sys.path.append(parent_dir)
 
 from autogen import ConversableAgent
 from autogen.coding import CodeBlock, CodeExecutor, CodeExtractor, CodeResult, MarkdownCodeExtractor
 
 from problem import Problem
-from prompts import *
+from prompts import CODE_AGENT_SYSTEM_PROMPT, FAILED_REPORT_PROMPT, INITIAL_PROMPT, REFLECTION_PROMPT
 from utils import check_correctness, run_python
 
 
 class PythonExecutor(CodeExecutor):
-    FAILED_REPORT_PROMPT = """\
-<expected>
-{gt_output}
-</expected>
----
-<got>
-{program_output}
-</got>
-"""
 
     @property
     def code_extractor(self) -> CodeExtractor:
@@ -71,7 +57,7 @@ class PythonExecutor(CodeExecutor):
                     log += "STATUS_SUCCESS"
                 else:
                     exitcode = 1
-                    failed_report = self.FAILED_REPORT_PROMPT.format(
+                    failed_report = FAILED_REPORT_PROMPT.format(
                         gt_output=gt_output,
                         program_output=program_output
                     )
@@ -99,11 +85,11 @@ def test_agent_summary(
 
     if "STATUS_SUCCESS" in test_results:
         return test_results
-    else:
-        return REFLECTION_PROMPT.format(
-            solution=solution,
-            test_results=test_results
-        )
+
+    return REFLECTION_PROMPT.format(
+        solution=solution,
+        test_results=test_results
+    )
 
 
 GOOGLE_API_KEY = os.environ["GOOGLE_API_KEY"]
@@ -125,10 +111,10 @@ EXECUTION_TIMEOUT = 60
 
 def main(problem_id: str, problem_title: str, data_dir: Path):
 
-    targer_dir = data_dir / problem_title
-    problem = Problem.from_name(problem_id, targer_dir)
-    generated_output_file = targer_dir / Path(f"{problem_id}_generated.txt")
-    code_path = targer_dir / Path(f"{problem_id}_generated.py")
+    target_dir = data_dir / problem_title
+    problem = Problem.from_name(problem_id, target_dir)
+    generated_output_file = target_dir / Path(f"{problem_id}_generated.txt")
+    code_path = target_dir / Path(f"{problem_id}_generated.py")
 
     executor = PythonExecutor(
         problem.sample_input_path,
